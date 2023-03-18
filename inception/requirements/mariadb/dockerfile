@@ -1,0 +1,12 @@
+FROM debian:buster
+
+RUN apt-get -y update && \
+	apt-get -y install mariadb-server
+
+COPY ./conf/msql_config.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
+COPY ./conf/db_setup.sh /
+RUN bash ./db_setup.sh
+
+EXPOSE 3306
+
+CMD ["mysqld_safe"]

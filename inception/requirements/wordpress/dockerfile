@@ -1,0 +1,23 @@
+FROM debian:buster
+
+RUN apt-get update && \
+    apt-get install -y \
+    wget \
+	php7.3-fpm \
+	php7.3-mysql \
+	mariadb-client
+
+RUN wget -q https://wordpress.org/latest.tar.gz -P /var/www
+RUN	cd /var/www && tar -xzvf latest.tar.gz && rm -rf latest.tar.gz 
+
+RUN wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+
+RUN chmod +x wp-cli.phar
+RUN mv wp-cli.phar /usr/bin/wp
+
+RUN mkdir /run/php
+COPY ./conf/www.conf /etc/php/7.3/fpm/pool.d
+COPY ./conf/wp_setup.sh /var/www/wordpress/wp_setup.sh
+RUN chmod +x /var/www/wordpress/wp_setup.sh
+
+CMD ["/var/www/wordpress/wp_setup.sh"]

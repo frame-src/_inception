@@ -1,0 +1,113 @@
+version: "3"
+
+services:
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./requirements/mariadb
+    networks:
+      - make_coffee
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+    restart: unless-stopped
+
+  wordpress:
+    container_name: wordpress
+    build:
+      context: ./requirements/wordpress
+    networks:
+      - make_coffee
+    ports:
+      - "9000:9000"
+    volumes:
+      - wp:/var/www/wordpress
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./requirements/nginx
+    ports:
+      - "443:443"
+    networks:
+      - make_coffee
+    volumes:
+      - wp:/var/www/wordpress
+    depends_on:
+      - wordpress
+      - mariadb
+    restart: unless-stopped
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/frmessin/Desktop/inception/inception/db
+  wp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/frmessin/Desktop/inception/inception/wp
+
+networks:
+    make_coffee:
+
+
+
+# version: "3.9"
+
+# services:
+#   mariadb:
+#     container_name: mariadb
+#     build: ./requirements/mariadb
+#     networks:
+#       - ilovecoffee
+#     volumes:
+#       - db_vol:/var/lib/mysql
+#     restart: always
+
+#   wordpress:
+#     container_name: wordpress
+#     build: ./requirements/wordpress
+#     networks:
+#       - ilovecoffee
+#     volumes:
+#       - wp_vol:/var/www/
+#     restart: always
+#     depends_on:
+#       - mariadb
+#       - nginx
+
+#   nginx:
+#     container_name: nginx
+#     build: ./requirements/nginx
+#     networks:
+#       - ilovecoffee
+#     volumes:
+#       - wp_vol:/var/www/
+#     restart: always
+
+# volumes:
+#   db_vol:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/frmessin/Desktop/inception/inception/db
+#   wp_vol:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       o: bind
+#       device: /home/frmessin/Desktop/inception/inception/wp
+
+
+# networks:
+#     ilovecoffee:
